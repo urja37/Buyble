@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Buyble.in</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header>
+  <h1>Buyble</h1>
+  <p style="color:#81ecec; font-style: italic; margin-top: 7px;">
+    Find and List Apartments for Rent or Sale
+  </p>
+  <nav>
+  <ul>
+    <li><a href="#" onclick="showPage('about');return false;">About Us</a></li>
+    <li><a href="#" onclick="showPage('listings');return false;">Listings</a></li>
+    <li><a href="#" onclick="showPage('add');return false;">Add Your Listing</a></li>
+  </ul>
+</nav>
+</header>
+
+<div class="container">
+  <!-- About Us Page -->
+<section id="about" class="about">
+  <div class="about-container">
+    <h2 class="section-title">Welcome to <span class="highlight">Buyble</span></h2>
+    <p class="about-tagline">
+      Finding your <span class="highlight">dream home</span> should be simple, transparent, and stress-free.
+    </p>
+
+    <div class="about-grid">
+      <div class="about-text">
+        <p>
+          Whether you are looking to <span class="rent">rent</span> a cozy apartment or <span class="sale">buy</span> a forever home, 
+          <strong>Buyble</strong> brings verified listings right to your fingertips.
+        </p>
+
+        <div class="why-choose">
+          <h3>✨ Why Choose Buyble?</h3>
+          <ul>
+            <li>✔ Wide range of verified properties</li>
+            <li>✔ Easy filtering for rent or sale</li>
+            <li>✔ Safe and simple listing process</li>
+            <li>✔ Mobile-friendly modern design</li>
+          </ul>
+        </div>
+
+        <p class="explore-links">
+          Start exploring our <a href="#" onclick="showPage('listings');return false;">Listings</a> or 
+          add your own property under <a href="#" onclick="showPage('add');return false;">Add Your Listing</a>.
+        </p>
+      </div>
+
+      <div class="about-image">
+        <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=80" alt="Dream Home">
+      </div>
+    </div>
+  </div>
+</section>
+
+
+  <!-- Listings Page -->
+  <section id="listings" class="listings" style="display: none;">
+    <h2 class="section-title">Explore Our Listings</h2>
+    <p style="text-align:center; max-width:700px; margin: 0 auto 25px;">
+      Browse through our wide range of apartments, condos, villas and studios. 
+      Use the filters below to refine by <em>Rent</em> or <em>Sale</em>.
+    </p>
+
+    <form id="filterForm">
+      <label for="type">Filter by Type:</label>
+      <select id="type" name="type">
+        <option value="All">All</option>
+        <option value="Rent">Rent</option>
+        <option value="Sale">Sale</option>
+      </select>
+      <input type="submit" value="Apply Filter">
+    </form>
+
+    <h3 class="section-title">
+      Available Apartments (<span id="count">0</span> found)
+    </h3>
+    <div class="listings" id="listingsContainer"></div>
+  </section>
+
+  <!-- Add Listing Page -->
+  <section id="add" class="add" style="display: none;">
+    <h2 class="section-title">List Your Property</h2>
+    <p style="text-align:center; max-width:700px; margin: 0 auto 25px;">
+      Do you have an apartment, villa, or condo to rent or sell? Add your property details 
+      below and make it visible to thousands of potential renters and buyers. 
+      It takes less than 2 minutes to create a listing!
+    </p>
+
+    <form id="addListingForm">
+      <div class="message" id="message" style="display: none;"></div>
+
+      <label for="title">Title:</label>
+      <input type="text" id="newTitle" name="title" placeholder="e.g. Spacious 2BHK in City Center" required>
+
+      <label for="address">Address:</label>
+      <input type="text" id="newAddress" name="address" placeholder="Full address of property" required>
+
+      <label for="price">Price (INR):</label>
+      <input type="number" step="0.01" id="newPrice" name="price" placeholder="e.g. 15000 or 5000000" required min="1">
+
+      <label for="type">Type:</label>
+      <select id="newType" name="type" required>
+        <option value="">-- Select --</option>
+        <option value="Rent">Rent</option>
+        <option value="Sale">Sale</option>
+      </select>
+
+      <label for="desc">Description:</label>
+      <textarea id="newDesc" name="desc" placeholder="Add key highlights of the property" required></textarea>
+
+      <label for="image">Image URL:</label>
+      <input type="text" id="newImage" name="image" placeholder="Link to property image" required>
+
+      <input type="submit" value="Add Listing">
+    </form>
+  </section>
+</div>
+
+<footer>
+  &copy; <span id="currentYear"></span> Buyble
+</footer>
+<!-- Chatbot Widget -->
+<div id="chatbot">
+  <div id="chatHeader">💬 Property Assistant</div>
+  <div id="chatBody" style="display: none;">
+    <div id="chatWindow"></div>
+    <div id="chatInputBox">
+      <input type="text" id="chatInput" placeholder="Enter your query here">
+      <button id="chatSend">Send</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Load apartments (use localStorage if available)
+let defaultApartments = [
+    {
+        title: "Luxury Apartment Downtown",
+        address: "123 Main St, City Center",
+        price: 25000,
+        type: "Rent",
+        image: "https://i.pinimg.com/originals/54/b6/18/54b61886e7d4850ec05309dc931c8a67.png",
+        desc: "Modern apartment with city views, 2 bedrooms, 2 baths."
+    },
+    {
+        title: "Cozy Family Home",
+        address: "456 Oak Rd, Suburbs",
+        price: 5500000,
+        type: "Sale",
+        image: "https://assets.architecturaldigest.in/photos/62ce97a5858ce07c21369f53/master/w_1600%2Cc_limit/E_PHX9884-Edit_FS.jpg://tse2.mm.bing.net/th/id/OIP.-KfTxQInErTccI6fzI1WoAHaE8?rs=1&pid=ImgDetMain&o=7&rm=3",
+        desc: "Spacious 3 bedroom home with garden, quiet neighborhood."
+    },
+    {
+        title: "Modern Studio",
+        address: "789 Pine Ln, Uptown",
+        price: 12000,
+        type: "Rent",
+        image: "https://th.bing.com/th/id/R.291e8186bf8fca8ceb55587b3c0d6361?rik=uJGd4pzLEClR3g&riu=http%3a%2f%2fthearchitectsdiary.com%2fwp-content%2fuploads%2f2017%2f11%2fPhotography-studio-interior-design-7.jpg&ehk=wKGA4GNeEZeUXtYGTm6USId%2brIR9ikxAh8C%2bSgBj%2b6M%3d&risl=&pid=ImgRaw&r=0",
+        desc: "Compact studio perfect for singles or students."
+    },
+    {
+        title: "Elegant Penthouse Suite",
+        address: "101 Skyline Blvd, Penthouse Floor",
+        price: 75000,
+        type: "Rent",
+        image: "https://img.freepik.com/premium-photo/elegant-penthouse-nestled-heart-luxury_974613-2237.jpg?w=2000",
+        desc: "Spacious penthouse with panoramic views and luxurious furnishings."
+    },
+    {
+        title: "Suburban Family Villa",
+        address: "202 Green Acres, Suburban Area",
+        price: 9500000,
+        type: "Sale",
+        image: "https://th.bing.com/th/id/R.30ab4a983e838c1a8af2cf2603d4834e?rik=EvfvQZ9n0q63cA&riu=http%3a%2f%2fwww.idesignarch.com%2fwp-content%2fuploads%2fModern-Villa-Bergen-Norway_4.jpg&ehk=j2h9x5Gl3KJMt%2f%2bwRTVH4D80ykUBMM07ZKzFYl9ZOUY%3d&risl=&pid=ImgRaw&r=0",
+        desc: "5-bedroom villa with garden, swimming pool & private parking."
+    },
+    {
+        title: "Chic Downtown Loft",
+        address: "55 Urban Street, Downtown",
+        price: 30000,
+        type: "Rent",
+        image: "https://tse3.mm.bing.net/th/id/OIP.MFW4VL7sFZ7NpZDFfs2AqAHaE7?rs=1&pid=ImgDetMain&o=7&rm=3",
+        desc: "Loft apartment with exposed brick, modern kitchen and balcony."
+    },
+    {
+        title: "Affordable Starter Home",
+        address: "77 Maple St, Quiet Town",
+        price: 3200000,
+        type: "Sale",
+        image: "https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=800&q=60",
+        desc: "Cozy 2-bedroom house ideal for first-time buyers."
+    },
+    {
+        title: "Luxury Condo with Amenities",
+        address: "88 Sunset Blvd, Uptown",
+        price: 42000,
+        type: "Rent",
+        image: "https://tse3.mm.bing.net/th/id/OIP.8rWVWIk_swHpWNc-Al4zCQHaEK?rs=1&pid=ImgDetMain&o=7&rm=3",
+        desc: "Condo featuring gym, pool and 24/7 security in vibrant community."
+    },
+    {
+        title: "Exclusive Luxury Penthouse",
+        address: "500 Skyline Tower, Top Floor",
+        price: 150000,
+        type: "Rent",
+        image: "https://newyorkyimby.com/wp-content/uploads/2018/05/82nd-Floor-Penthouse-in-from-30-Park-Place-image-by-Andrew-Campbell-Nelson.jpg",
+        desc: "Exclusive penthouse with private rooftop pool, smart home integration, panoramic city views, and 3 spacious bedrooms."
+    }
+];
+
+let apartments = JSON.parse(localStorage.getItem("apartments")) || defaultApartments;
+
+function saveApartments() {
+  localStorage.setItem("apartments", JSON.stringify(apartments));
+}
+
+// Format price
+function formatPrice(price, type) {
+  const formatted = price.toLocaleString('en-IN');
+  return type === 'Rent' ? `₹${formatted} / month` : `₹${formatted}`;
+}
+
+// Create apartment card
+function createApartmentCard(apartment) {
+  return `
+    <div class="card">
+      <img src="${apartment.image}" alt="${apartment.title}">
+      <div class="card-content">
+        <div class="title">${apartment.title}</div>
+        <div class="address">${apartment.address}</div>
+        <div class="price">${formatPrice(apartment.price, apartment.type)}</div>
+        <div class="desc">${apartment.desc}</div>
+      </div>
+    </div>
+  `;
+}
+
+// Display apartments
+function displayApartments(filterType = 'All') {
+  const listingsContainer = document.getElementById('listingsContainer');
+  const countSpan = document.getElementById('count');
+
+  const filtered = apartments.filter(apartment =>
+    filterType === 'All' || apartment.type === filterType
+  );
+
+  countSpan.textContent = filtered.length;
+  listingsContainer.innerHTML = filtered.map(createApartmentCard).join('');
+}
+
+// Show message
+function showMessage(message, isSuccess = true) {
+  const messageDiv = document.getElementById('message');
+  messageDiv.textContent = message;
+  messageDiv.style.display = 'block';
+  messageDiv.style.background = isSuccess ? '#1a9af7' : '#ff7675';
+  setTimeout(() => { messageDiv.style.display = 'none'; }, 3000);
+}
+
+// Page switching ✅ fixed IDs
+function showPage(page) {
+  // hide all sections first
+  document.getElementById('about').style.display = 'none';
+  document.getElementById('listings').style.display = 'none';
+  document.getElementById('add').style.display = 'none';
+
+  // show the selected section
+  if (page === 'about') {
+    document.getElementById('about').style.display = 'block';
+  } else if (page === 'listings') {
+    document.getElementById('listings').style.display = 'block';
+    displayApartments(); // refresh listings
+  } else if (page === 'add') {
+    document.getElementById('add').style.display = 'block';
+  }
+}
+
+
+// Filter form
+document.getElementById('filterForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const filterType = document.getElementById('type').value;
+  displayApartments(filterType);
+});
+
+// Add listing form
+document.getElementById('addListingForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+
+  const title = document.getElementById('newTitle').value.trim();
+  const address = document.getElementById('newAddress').value.trim();
+  const price = parseFloat(document.getElementById('newPrice').value);
+  const type = document.getElementById('newType').value;
+  const desc = document.getElementById('newDesc').value.trim();
+  const image = document.getElementById('newImage').value.trim();
+
+  if (!title || !address || !price || !type || !desc || !image) {
+    showMessage("All fields are required and price must be > 0.", false);
+    return;
+  }
+
+  if (price <= 0) {
+    showMessage("Price must be greater than 0.", false);
+    return;
+  }
+
+  const newApartment = { title, address, price, type, desc, image };
+  apartments.push(newApartment);
+  saveApartments();
+
+  document.getElementById('addListingForm').reset();
+  showMessage("New apartment listing added successfully!");
+});
+
+// Current year in footer
+document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+// Default page
+showPage('about');
+// Simple rule-based chatbot
+function addMessage(msg, sender="bot") {
+  const chatWindow = document.getElementById("chatWindow");
+  const msgDiv = document.createElement("div");
+  msgDiv.classList.add("chatMsg", sender === "user" ? "userMsg" : "botMsg");
+  msgDiv.textContent = msg;
+  chatWindow.appendChild(msgDiv);
+  chatWindow.scrollTop = chatWindow.scrollHeight;
+}
+
+document.getElementById("chatHeader").addEventListener("click", () => {
+  const body = document.getElementById("chatBody");
+  body.style.display = (body.style.display === "none") ? "flex" : "none";
+});
+
+document.getElementById("chatSend").addEventListener("click", handleUserMessage);
+document.getElementById("chatInput").addEventListener("keypress", e => {
+  if (e.key === "Enter") handleUserMessage();
+});
+
+function handleUserMessage() {
+  const input = document.getElementById("chatInput");
+  const userMsg = input.value.trim();
+  if (!userMsg) return;
+
+  // Show user message
+  addMessage(userMsg, "user");
+  input.value = "";
+
+  let results = apartments;
+
+  // Check Rent or Sale keywords
+  if (/rent/i.test(userMsg)) {
+    results = results.filter(a => a.type.toLowerCase() === "rent");
+  } else if (/sale|buy/i.test(userMsg)) {
+    results = results.filter(a => a.type.toLowerCase() === "sale");
+  }
+
+  // Extract numbers (budget)
+  const priceMatch = userMsg.match(/(\d{4,7})/);
+  if (priceMatch) {
+    const budget = parseInt(priceMatch[1]);
+    results = results.filter(a => a.price <= budget);
+  }
+
+  // Reply with results
+  if (results.length > 0) {
+    addMessage(`I found ${results.length} matching properties:`, "bot");
+    results.slice(0, 3).forEach(a => {
+      addMessage(`${a.title} — ${formatPrice(a.price, a.type)}\n📍 ${a.address}`, "bot");
+    });
+    if (results.length > 3) {
+      addMessage("…and more! Check the Listings page for all details.", "bot");
+    }
+  } else {
+    addMessage("Sorry, I couldn’t find any properties matching your query. Try adjusting your budget or type.", "bot");
+  }
+}
+
+
+</script>
+</body>
+</html>
